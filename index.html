@@ -60354,5 +60354,38 @@ VTVY,14.4,13.13,500,0,11.63,0
 VTVY,9.5,14,500,0,6.64,0.96
 VTVY,2.5,13.2,500,0,1.72,0
 VTVY,2.5,13.2,500,0,1.72,0`;    </script>
+
+// [원리 설명] 
+// async: "이 작업은 시간이 좀 걸릴 수 있으니 비동기적으로 처리할게"라는 뜻입니다.
+// await: "데이터베이스 응답이 올 때까지 잠시만 기다려줘"라는 뜻입니다.
+
+async function insertShipData() {
+    console.log("Supabase로 데이터를 전송합니다...");
+
+    const { data, error } = await _supabase
+        .from('ship_performance') // 1. 어떤 선반(Table)에 넣을지 정합니다.
+        .insert([                 // 2. 실제 데이터를 넣습니다.
+            { 
+                ship_name: 'Daniel-Express', 
+                speed: 25, 
+                fuel_consumption: 120.5 
+            }
+        ]);
+
+    // 3. 결과에 따른 처리
+    if (error) {
+        // 전송 중에 문제가 생기면 빨간 글씨로 에러를 보여줍니다.
+        console.error("데이터 저장 실패..ㅠ:", error.message);
+    } else {
+        // 성공하면 콘솔과 알림창으로 알려줍니다.
+        console.log("데이터 저장 성공! 창고를 확인해 보세요:", data);
+        alert("성공적으로 데이터를 보냈습니다!");
+    }
+}
+
+// 4. 실제로 함수를 실행시키는 명령입니다. 
+// 이 줄이 없으면 레시피만 적어놓고 요리는 안 하는 것과 같습니다.
+insertShipData();
+
 </body>
 </html>
