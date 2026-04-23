@@ -60366,9 +60366,9 @@ async function insertShipData() {
         .from('ship_performance') // 1. 어떤 선반(Table)에 넣을지 정합니다.
         .insert([                 // 2. 실제 데이터를 넣습니다.
             { 
-                ship_name: 'Daniel-Express', 
-                speed: 25, 
-                fuel_consumption: 120.5 
+                SHIP_NAME: 'Daniel-Express', 
+                SPEED: 25, 
+                FUEL_CONSUMPTION: 120.5 
             }
         ]);
 
