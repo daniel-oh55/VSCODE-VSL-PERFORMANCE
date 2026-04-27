@@ -177,6 +177,15 @@ input {
     transition: all 0.3s ease; 
 }
 
+#vsl1_code, #vsl2_code {
+    text-transform: uppercase;
+}
+
+/* 입력할 때 글자가 소문자에서 대문자로 튀는 느낌을 없애기 위해 폰트 설정 유지 */
+#vsl1_code::placeholder, #vsl2_code::placeholder {
+    text-transform: none; /* placeholder는 원래대로 표시 */
+}
+
 .vessel-label {
     font-family: 'Inter', sans-serif;
     font-weight: 800;               
