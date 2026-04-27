@@ -587,7 +587,57 @@ function goToDashboard() {
     document.getElementById('sec-dashboard').classList.remove('hidden');
     initAnalyzer(); 
 }
-// (나머지 showUserMgmt, renderList, addUser, delUser, backToAdmin 함수는 기존과 동일하게 유지)
+
+// 3.5 유저 권한 관리용 도구 세트 (추가분) [cite: 112-124]
+function showUserMgmt() {
+    document.getElementById('sec-admin-menu').classList.add('hidden');
+    document.getElementById('sec-user-mgmt').classList.remove('hidden');
+    renderList(); 
+}
+
+function renderList() {
+    const ui = document.getElementById('whitelist-ui');
+    if (!ui) return;
+    ui.innerHTML = '';
+    
+    whitelist.forEach((m, i) => {
+        if(ADMIN_KEYS.includes(m)) return; 
+        const isDefault = DEFAULT_VISITORS.includes(m);
+        ui.innerHTML += `
+            <div class="user-item" style="display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1);">
+                <span style="${isDefault ? 'color: #3498db; font-weight: bold;' : ''}">${m} ${isDefault ? '(SYSTEM)' : ''}</span>
+                ${isDefault ? 
+                    '<span style="color:gray; font-size:10px;">삭제불가</span>' : 
+                    `<span style="color:red; cursor:pointer; font-weight:bold;" onclick="delUser(${i})">삭제</span>`
+                }
+            </div>`;
+    });
+    localStorage.setItem('sk_auth_list', JSON.stringify(whitelist));
+}
+
+function addUser() {
+    const inputField = document.getElementById('new-user-email');
+    const m = inputField.value.trim().toLowerCase();
+    if(m && !whitelist.includes(m)) { 
+        whitelist.push(m);
+        renderList();
+        inputField.value = '';
+    } else if(whitelist.includes(m)) {
+        alert('이미 등록된 이메일입니다.');
+    }
+}
+
+function delUser(i) { 
+    if(confirm('해당 유저를 삭제하시겠습니까?')) {
+        whitelist.splice(i, 1);
+        renderList(); 
+    }
+}
+
+function backToAdmin() { 
+    document.getElementById('sec-user-mgmt').classList.add('hidden'); 
+    document.getElementById('sec-admin-menu').classList.remove('hidden'); 
+}// (나머지 showUserMgmt, renderList, addUser, delUser, backToAdmin 함수는 기존과 동일하게 유지)
 
 // 4. 데이터 분석 엔진 (여기서부터가 핵심 수정본입니다!) [cite: 306-340]
 let shipDB = [], voyageDB = [], myChart;
