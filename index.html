@@ -3,164 +3,622 @@
 <head>
     <meta charset="UTF-8">
     <title>SHIP PERFORMANCE ANALYZER - PRO v15</title>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@800&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
     <style>
-        :root {
+
+
+:root {
             --v1-blue: #3498db;
             --v2-gold: #f39c12;
             --bg: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
             --text: #e1e4e8;
+            --toolbar-bg: rgba(255, 255, 255, 0.05); 
         }
 
         body { 
             font-family: 'Pretendard', 'Malgun Gothic', sans-serif; 
-            background: var(--bg); background-attachment: fixed; margin: 0; padding: 25px; color: var(--text); min-height: 100vh;
+            background: var(--bg); 
+            background-attachment: fixed; 
+            margin: 0; 
+            padding: 25px; 
+            color: var(--text); 
+            min-height: 100vh;
         }
         
         header { text-align: center; margin-bottom: 20px; }
-        header h1 { font-size: 32px; font-weight: 900; color: #ffffff; text-shadow: 0 0 20px rgba(52, 152, 219, 0.5); }
-
-        .global-toolbar {
-            display: flex; justify-content: center; align-items: center; gap: 20px; margin: 0 auto 30px auto; width: fit-content;
-            background: rgba(255, 255, 255, 0.08); padding: 15px 30px; border-radius: 50px; backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.15);
+        header h1 { 
+            font-size: 32px; 
+            font-weight: 900; 
+            color: #ffffff; 
+            margin: 0; 
+            letter-spacing: -1px;
+            text-shadow: 0 0 20px rgba(52, 152, 219, 0.5);
         }
 
-        .global-toolbar select { padding: 8px 15px; border-radius: 8px; color: white; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); font-weight: 800; }
 
-        .dashboard-container { display: flex; gap: 20px; justify-content: center; width: 100%; max-width: 1000px; margin: 0 auto; }
-        .vessel-card { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(15px); border-radius: 24px; padding: 25px; flex: 1; min-width: 520px; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .vessel-card.v1 { border-top: 2px solid var(--v1-blue); }
-        .vessel-card.v2 { border-top: 2px solid var(--v2-gold); }
+.global-toolbar {
+            display: flex; justify-content: center; align-items: center; gap: 20px;
+            margin: 0 auto 30px auto; width: fit-content;
+   background: rgba(255, 255, 255, 0.08); 
+   padding: 15px 30px; border-radius: 50px;
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+        }
 
-        .lookup-row { display: flex; gap: 15px; background: rgba(0, 0, 0, 0.3); padding: 18px; border-radius: 12px; margin-bottom: 20px; }
-        .field { flex: 1; display: flex; flex-direction: column; }
-        .field label { font-size: 11px; color: #95a5a6; margin-bottom: 8px; text-transform: uppercase; }
-        input { background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px; color: white; }
+.toolbar-label { 
+    font-family: 'Inter', sans-serif;
+    font-size: 12px; 
+    font-weight: 800; 
+    color: #ffffff;       
+    text-transform: uppercase; 
+    letter-spacing: 1.5px; 
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
 
-        .calc-btn { width: 100%; padding: 14px; color: white; border: none; border-radius: 12px; cursor: pointer; font-weight: 800; text-transform: uppercase; margin-bottom: 15px; }
-        .v1 .calc-btn { background: var(--v1-blue); }
-        .v2 .calc-btn { background: var(--v2-gold); }
+.global-toolbar select { 
+    padding: 8px 15px; 
+    border-radius: 8px; 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    font-size: 14px; 
+    font-weight: 800; 
+    color: #ffffff; 
+    background: rgba(255, 255, 255, 0.1); 
+    cursor: pointer; 
+    font-family: 'JetBrains Mono', monospace;
+    outline: none;
+}
 
-        table { width: 100%; border-collapse: collapse; font-size: 14px; }
-        th { padding: 10px; border-bottom: 1px solid rgba(255,255,255,0.1); color: white; text-transform: uppercase; }
-        td { padding: 10px; text-align: center; border-bottom: 1px solid rgba(255,255,255,0.05); color: rgba(255,255,255,0.8); font-family: 'JetBrains Mono'; }
-        .total-cell { font-weight: 800; color: var(--v1-blue); }
-        .v2 .total-cell { color: var(--v2-gold); }
 
-        .chart-container { background: rgba(255, 255, 255, 0.03); padding: 30px; border-radius: 24px; margin: 40px auto; max-width: 1000px; height: 400px; }
+.global-toolbar select option {
+    background-color: #24243e; 
+    color: #ffffff; 
+    padding: 10px;
+}
 
-        .hidden { display: none !important; }
-        .auth-card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(20px); padding: 40px; border-radius: 30px; text-align: center; width: 100%; max-width: 400px; margin: 15vh auto; border: 1px solid rgba(255, 255, 255, 0.1); }
-        .btn-login-gradient { background: linear-gradient(90deg, #3498db, #f39c12); color: white; width: 100%; padding: 15px; border-radius: 12px; border: none; font-weight: 900; cursor: pointer; }
+ .global-toolbar select:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.global-toolbar .min-max span {
+    color: #ffffff !important;
+    font-weight: 800;
+}
+
+.dashboard-container { 
+    display: flex; 
+    gap: 20px; 
+    justify-content: center; 
+    margin-bottom: 25px; 
+    /* --- 아래 세 줄 추가 --- */
+    width: 100%; 
+    max-width: 1000px; 
+    margin: 0 auto;  
+}
+
+
+.vessel-card { 
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 24px; 
+    padding: 25px; 
+    flex: 1; 
+    min-width: 520px;
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+    transition: all 0.3s ease;
+}
+
+.vessel-card.v1 { 
+    background: rgba(41, 128, 185, 0.06); 
+    border-top: 1px solid rgba(41, 128, 185, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
+                inset 0 0 20px rgba(41, 128, 185, 0.05); 
+}
+
+.vessel-card.v2 { 
+    background: rgba(243, 156, 18, 0.06); 
+    border-top: 1px solid rgba(243, 156, 18, 0.4);
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3), 
+                inset 0 0 20px rgba(243, 156, 18, 0.05); 
+}
+
+.vessel-card:hover { transform: translateY(-5px); background: rgba(255, 255, 255, 0.05); }
+
+
+        .vessel-label { font-size: 20px; font-weight: 900; margin-bottom: 20px; display: block; border-bottom: 2px solid #f1f2f6; padding-bottom: 10px; }
+        .v1 .vessel-label { color: var(--v1-blue); }
+        .v2 .vessel-label { color: var(--v2-gold); }
+
+
+
+.lookup-row { 
+    display: flex; 
+    flex-direction: row; 
+    justify-content: space-between; 
+    gap: 15px; 
+    background: rgba(0, 0, 0, 0.3); 
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 18px; 
+    border-radius: 12px; 
+    margin-bottom: 20px; 
+}
+
+.field { 
+    flex: 1; 
+    display: flex; 
+    flex-direction: column;
+    min-width: 0;
+}
+
+.field label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    font-size: 11px;   
+    color: #95a5a6;   
+    margin-bottom: 8px;
+    text-transform: uppercase; 
+    letter-spacing: 0.05em;   
+}
+
+input { 
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;                
+    font-size: 15px; 
+    color: #ffffff;          
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1); 
+    border-radius: 10px; 
+    padding: 12px; 
+    transition: all 0.3s ease; 
+}
+
+.vessel-label {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;               
+    font-size: 18px;
+    letter-spacing: -0.02em;
+}
+
+input:focus { 
+    outline: none; 
+    background: rgba(255, 255, 255, 0.12);
+    border-color: var(--v1-blue); 
+    box-shadow: 0 0 12px rgba(52, 152, 219, 0.4), inset 0 0 8px rgba(52, 152, 219, 0.1);
+    transform: translateY(-1px);
+}
+
+.v2 input:focus {
+    border-color: var(--v2-gold);
+    box-shadow: 0 0 12px rgba(243, 156, 18, 0.4), inset 0 0 8px rgba(243, 156, 18, 0.1);
+}
+
+
+input[readonly] { 
+    background-color: rgba(0, 0, 0, 0.3); 
+    border-style: none; 
+    color: #888; 
+}
+        .condition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .min-max { display: flex; gap: 8px; align-items: center; }
+        .min-max input { width: 45%; text-align: center; font-weight: bold; }
+
+.calc-btn { 
+    width: 100%; 
+    padding: 14px; 
+    color: white; 
+    border: none; 
+    border-radius: 12px; 
+    cursor: pointer; 
+    font-family: 'Inter', sans-serif;
+    font-weight: 800; 
+    font-size: 15px; 
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+    position: relative;
+    overflow: hidden;
+}
+
+.v1 .calc-btn { 
+    background: linear-gradient(135deg, #2980b9 0%, #3498db 50%, #6dd5fa 100%);
+    box-shadow: 0 4px 15px rgba(41, 128, 185, 0.3);
+}
+
+.v2 .calc-btn { 
+    background: linear-gradient(135deg, #e67e22 0%, #f39c12 50%, #f1c40f 100%);
+    box-shadow: 0 4px 15px rgba(243, 156, 18, 0.3);
+}
+
+.calc-btn:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);  
+}
+
+.v1 .calc-btn:hover {
+    box-shadow: 0 8px 25px rgba(41, 128, 185, 0.5);
+}
+
+.v2 .calc-btn:hover {
+    box-shadow: 0 8px 25px rgba(243, 156, 18, 0.5);
+}
+
+.calc-btn:active {
+    transform: translateY(1px);
+    filter: brightness(0.9);
+}
+
+.table-container {
+    margin-top: 20px;
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+table { 
+    width: 100%; 
+    border-collapse: separate; 
+    border-spacing: 0; 
+    font-size: 14px; 
+}
+
+th { 
+    background: rgba(255, 255, 255, 0.02); 
+    padding: 12px; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1); 
+    color: rgba(255, 255, 255, 0.5); 
+
+font-family: 'Inter', sans-serif; 
+    font-weight: 800;           
+    font-size: 12px;              
+    color: #ffffff;                  
+    text-transform: uppercase; 
+    letter-spacing: 1px;
+    text-align: center;
+}
+
+td { 
+    padding: 12px 10px; 
+    text-align: center; 
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03); 
+    color: rgba(255, 255, 255, 0.8);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;  
+    font-size: 14px; 
+    font-variant-numeric: tabular-nums;  
+    color: rgba(255, 255, 255, 0.9);
+}
+
+tr:hover td { 
+    background: rgba(255, 255, 255, 0.05); 
+    color: #fff;
+}
+
+.total-cell { 
+    font-weight: 800; 
+    background: linear-gradient(to right, rgba(255,255,255,0.02), rgba(255,255,255,0.05));
+    position: relative;
+}
+
+.v1 .total-cell { 
+    font-weight: 800; 
+    color: #3498db; 
+}
+.v2 .total-cell { 
+    font-weight: 800; 
+    color: #f39c12; 
+}
+
+#vsl1_table tr, #vsl2_table tr {
+        animation: fadeIn 0.4s ease-out forwards;
+    }
+
+    @keyframes fadeIn {
+        from { 
+            opacity: 0; 
+            transform: translateY(5px); 
+        }
+        to { 
+            opacity: 1; 
+            transform: translateY(0); 
+        }
+    }
+
+
+td:first-child {
+    font-weight: 700;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.01);
+}
+
+
+.chart-container { 
+    background: rgba(255, 255, 255, 0.03); 
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 15px 45px rgba(0, 0, 0, 0.4);
+    padding: 30px; 
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 40px auto;
+    max-width: 1100px;
+    height: 450px; 
+    position: relative;
+}
+
+.hidden { display: none !important; }
+.auth-card {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(20px);
+    padding: 40px; border-radius: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    text-align: center; width: 100%; max-width: 400px;
+    margin: 10vh auto; box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+}
+.auth-input {
+    width: 100%; padding: 12px; margin-bottom: 15px;
+    background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 10px; color: white; box-sizing: border-box;
+}
+.auth-btn {
+    width: 100%; padding: 12px; border-radius: 10px; border: none;
+    font-weight: 800; cursor: pointer; transition: 0.3s; margin-bottom: 10px;
+}
+.btn-blue { background: #3498db; color: white; }
+.btn-orange { background: #e67e22; color: white; }
+.btn-logout { background: transparent; border: 1px solid rgba(255,255,255,0.2); color: #888; margin-top: 20px; font-size: 12px; }
+.user-item { display: flex; justify-content: space-between; padding: 8px; border-bottom: 1px solid rgba(255,255,255,0.1); font-size: 13px; }
+
+#sec-login.auth-card {
+    background: rgba(255, 255, 255, 0.03); /* 더 투명하게 */
+    backdrop-filter: blur(25px) saturate(180%); /* 배경 흐림 강화 */
+    -webkit-backdrop-filter: blur(25px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.15); /* 얇은 유리 테두리 */
+    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.6), 
+                inset 0 0 15px rgba(255, 255, 255, 0.05); /* 내부 광택 */
+    border-radius: 30px;
+    padding: 50px 40px;
+    max-width: 420px;
+}
+
+/* 아이콘 섹션 */
+.auth-icon {
+    font-size: 60px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 15px rgba(52, 152, 219, 0.6));
+}
+
+/* 텍스트 스타일 */
+#sec-login h2 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    letter-spacing: 2px;
+    margin-bottom: 5px;
+    color: #ffffff;
+}
+
+.auth-subtitle {
+    font-size: 13px;
+    color: rgba(255, 255, 255, 0.5);
+    letter-spacing: 3px;
+    margin-bottom: 35px;
+    font-weight: 600;
+}
+
+/* 입력창 개선 */
+.auth-input-group { margin-bottom: 15px; }
+
+.auth-input {
+    background: rgba(0, 0, 0, 0.4) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 15px 20px !important;
+    font-size: 14px !important;
+    border-radius: 12px !important;
+    transition: all 0.3s ease;
+}
+
+.auth-input:focus {
+    border-color: #3498db !important;
+    box-shadow: 0 0 15px rgba(52, 152, 219, 0.3) !important;
+    background: rgba(0, 0, 0, 0.6) !important;
+}
+
+/* 이미지 컨셉을 반영한 로그인 버튼 */
+.btn-login-gradient {
+    background: linear-gradient(90deg, #3498db 0%, #f39c12 100%) !important;
+    color: white !important;
+    border: none !important;
+    font-size: 16px !important;
+    font-weight: 900 !important;
+    letter-spacing: 2px !important;
+    padding: 16px !important;
+    margin-top: 20px;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+    text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.btn-login-gradient:hover {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+    box-shadow: 0 15px 30px rgba(52, 152, 219, 0.3);
+}
+
+/* 추가 링크 (이미지의 Forgot password 느낌) */
+.auth-footer-links {
+    margin-top: 25px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-footer-links span { cursor: pointer; transition: 0.3s; }
+.auth-footer-links span:hover { color: #fff; }
+
     </style>
 </head>
 <body>
-
 <div id="sec-login" class="auth-card">
-    <div style="font-size: 50px; margin-bottom: 15px;">🛡️</div>
+    <div class="auth-icon">🛡️</div> <p style="font-size: 11px; color: rgba(255,255,255,0.4); margin: 0;">SKR & HAL</p>
     <h2>SYSTEM ACCESS</h2>
-    <p style="color: gray; font-size: 12px; letter-spacing: 2px; margin-bottom: 30px;">SHIP PERFORMANCE ANALYZER</p>
-    <input type="email" id="auth-email" class="auth-input" placeholder="이메일을 입력하세요" style="width: 100%; padding: 12px; margin-bottom: 15px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 10px; box-sizing: border-box;" onkeyup="if(window.event.keyCode==13){handleAuth()}">
-    <button class="btn-login-gradient" onclick="handleAuth()">LOGIN</button>
+    <p class="auth-subtitle">SHIP PERFORMANCE ANALYZER</p>
+    
+    <div class="auth-input-group">
+        <input type="email" id="auth-email" class="auth-input" 
+               placeholder="이메일 주소를 입력하세요" 
+               onkeyup="if(window.event.keyCode==13){handleAuth()}">
+        
+        <input type="password" class="auth-input" style="margin-top:10px"
+               placeholder="••••••••">
+    </div>
+    
+    <button class="auth-btn btn-login-gradient" onclick="handleAuth()">
+        LOGIN
+    </button>
+
+    <div class="auth-footer-links">
+        <span>Forgot password?</span>
+        <span>Create Account</span>
+    </div>
 </div>
 
+
+<div id="sec-admin-menu" class="auth-card hidden">
+    <h2 style="color:white;">⚙️ ADMIN MENU</h2>
+    <button class="auth-btn btn-orange" onclick="showUserMgmt()">👥 유저 권한 관리</button>
+    <button class="auth-btn btn-blue" onclick="goToDashboard()">🚢 분석기 바로가기</button>
+    <button class="auth-btn btn-logout" onclick="location.reload()">로그아웃</button>
+</div>
+
+<div id="sec-user-mgmt" class="auth-card hidden">
+    <h2 style="color:white;">USER MGMT</h2>
+    <input type="email" id="new-user-email" class="auth-input" placeholder="새 유저 이메일">
+    <button class="auth-btn btn-orange" onclick="addUser()">유저 추가</button>
+    <div id="whitelist-ui" style="text-align:left; margin-top:15px; background:rgba(0,0,0,0.2); border-radius:8px; padding:10px;"></div>
+    <button class="auth-btn btn-logout" onclick="backToAdmin()">뒤로가기</button>
+</div>
+
+
 <div id="sec-dashboard" class="hidden">
-    <header><h1>SHIP PERFORMANCE ANALYZER</h1></header>
+    <header>
+        <h1>SHIP PERFORMANCE ANALYZER</h1>
+    </header>
+
     <div class="global-toolbar">
-        <span>SPEED RANGE</span>
-        <select id="global_spd_min" onchange="refreshTables()"></select> ~ <select id="global_spd_max" onchange="refreshTables()"></select>
+        <span class="toolbar-label">SPEED RANGE</span>
+        <div class="min-max">
+            <select id="global_spd_min" onchange="refreshTables()"></select>
+            <span style="font-weight: bold; color: #bdc3c7;">~</span>
+            <select id="global_spd_max" onchange="refreshTables()"></select>
+        </div>
     </div>
 
     <div class="dashboard-container">
         <section class="vessel-card v1">
-            <span style="color: var(--v1-blue); font-weight: 900; font-size: 18px; display: block; margin-bottom: 15px;">VESSEL 1</span>
+            <span class="vessel-label">VESSEL 1</span>
             <div class="lookup-row">
-                <div class="field"><label>CODE</label><input type="text" id="vsl1_code" placeholder="예: AKTR" onkeyup="checkEnter(event, 1)"></div>
-                <div class="field"><label>NAME</label><input type="text" id="vsl1_name" readonly></div>
+                <div class="field"><label>VESSEL CODE 입력</label>
+                    <input type="text" id="vsl1_code" placeholder="예: AKTR" tabindex="1" onkeyup="checkEnter(event, 1)">
+                </div>
+                <div class="field"><label>VESSEL NAME</label>
+                    <input type="text" id="vsl1_name" readonly tabindex="2">
+                </div>
             </div>
             <div class="condition-grid">
-                <div class="field"><label>R/H Range</label><div><input type="number" id="vsl1_rh_min" value="23" style="width: 60px;"> ~ <input type="number" id="vsl1_rh_max" value="25" style="width: 60px;"></div></div>
+                <div class="field"><label>R/H Range</label><div class="min-max"><input type="number" id="vsl1_rh_min" value="23" tabindex="5"> ~ <input type="number" id="vsl1_rh_max" value="25" tabindex="6"></div></div>
+                <div class="field"><label>SLIP %</label><div class="min-max"><input type="number" id="vsl1_slip_min" value="-10" tabindex="9"> ~ <input type="number" id="vsl1_slip_max" value="10" tabindex="10"></div></div>
             </div>
-            <button class="calc-btn" onclick="runAnalysis(1)">SEARCH 1</button>
+            <button class="calc-btn" onclick="runAnalysis(1)" tabindex="13">SEARCH 1</button>
             <table><thead><tr><th>SPD</th><th>RPM</th><th>FO</th><th>MGO</th><th>TOTAL</th></tr></thead><tbody id="vsl1_table"></tbody></table>
         </section>
 
         <section class="vessel-card v2">
-            <span style="color: var(--v2-gold); font-weight: 900; font-size: 18px; display: block; margin-bottom: 15px;">VESSEL 2</span>
+            <span class="vessel-label">VESSEL 2</span>
             <div class="lookup-row">
-                <div class="field"><label>CODE</label><input type="text" id="vsl2_code" placeholder="예: MEBG" onkeyup="checkEnter(event, 2)"></div>
-                <div class="field"><label>NAME</label><input type="text" id="vsl2_name" readonly></div>
+                <div class="field"><label>VESSEL CODE 입력</label>
+                    <input type="text" id="vsl2_code" placeholder="예: MEBG" tabindex="3" onkeyup="checkEnter(event, 2)">
+                </div>
+                <div class="field"><label>VESSEL NAME</label>
+                    <input type="text" id="vsl2_name" readonly tabindex="4">
+                </div>
             </div>
             <div class="condition-grid">
-                <div class="field"><label>R/H Range</label><div><input type="number" id="vsl2_rh_min" value="23" style="width: 60px;"> ~ <input type="number" id="vsl2_rh_max" value="25" style="width: 60px;"></div></div>
+                <div class="field"><label>R/H Range</label><div class="min-max"><input type="number" id="vsl2_rh_min" value="23" tabindex="7"> ~ <input type="number" id="vsl2_rh_max" value="25" tabindex="8"></div></div>
+                <div class="field"><label>SLIP %</label><div class="min-max"><input type="number" id="vsl2_slip_min" value="-10" tabindex="11"> ~ <input type="number" id="vsl2_slip_max" value="10" tabindex="12"></div></div>
             </div>
-            <button class="calc-btn" onclick="runAnalysis(2)">SEARCH 2</button>
+            <button class="calc-btn" onclick="runAnalysis(2)" tabindex="14">SEARCH 2</button>
             <table><thead><tr><th>SPD</th><th>RPM</th><th>FO</th><th>MGO</th><th>TOTAL</th></tr></thead><tbody id="vsl2_table"></tbody></table>
         </section>
     </div>
 
-    <div class="chart-container"><canvas id="performanceChart"></canvas></div>
-</div>
+    <div class="chart-container">
+        <canvas id="performanceChart" height="90"></canvas>
+    </div>
 
-<script>
-// --- Supabase 설정 ---
+
+    <script>
+// 1. Supabase 연결 설정 [cite: 282]
 const SUPABASE_URL = 'https://hihplowwftsezsvewkcq.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImhpaHBsb3d3ZnRzZXpzdmV3a2NxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY5MzIxNTUsImV4cCI6MjA5MjUwODE1NX0.Tk6P9zWFwhe0bcFUISE4ILZxxvp9rhrZi8UaNl4SY3I'; 
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// --- 인증 시스템 ---
+// 2. 인증 시스템 설정 [cite: 283, 284]
 const ADMIN_KEYS = ['admin@sinokor.co.kr', 'daniel']; 
-const DEFAULT_VISITORS = ['456456', 'daniel@sinokor.co.kr', 'skhwang@sinokor.co.kr', 'andalucia@sinokor.co.kr'];
-let whitelist = [...new Set([...DEFAULT_VISITORS])];
+const DEFAULT_VISITORS = ['456456', 'daniel@sinokor.co.kr', 'skhwang@sinokor.co.kr', 'andalucia@sinokor.co.kr', 'wtlee@sinokor.co.kr', 'sjunkim@heungaline.com', 'cys33@sinokor.co.kr', 'geonwook.kim@sinokor.co.kr ', 'bslee@sinokor.co.kr', 'mjchang@sinokor.co.kr', 'ijryu@sinokor.co.kr', 'kimmc@sinokor.co.kr', 'shjung@sinokor.co.kr', 'smmoon@heungaline.com', 'friend@sinokor.co.kr', 'binlee@heungaline.com', 'ghl@sinokor.co.kr', 'jaehkim@sinokor.co.kr', 'hwkang2@sinokor.co.kr'];
+let savedList = JSON.parse(localStorage.getItem('sk_auth_list')) || [];
+let whitelist = [...new Set([...DEFAULT_VISITORS, ...savedList])];
 
+// 3. 인증 관련 함수들 [cite: 287-305]
 function handleAuth() {
-    const input = document.getElementById('auth-email').value.trim().toLowerCase();
+    const inputField = document.getElementById('auth-email');
+    const input = inputField.value.trim().toLowerCase();
+    if (!input) { alert('이메일을 입력해주세요.'); return; }
     if (ADMIN_KEYS.includes(input) || whitelist.includes(input)) {
         document.getElementById('sec-login').classList.add('hidden');
-        document.getElementById('sec-dashboard').classList.remove('hidden');
-        initAnalyzer();
-    } else {
-        alert('❌ 권한이 없습니다.');
-    }
+        if (ADMIN_KEYS.includes(input)) document.getElementById('sec-admin-menu').classList.remove('hidden');
+        else goToDashboard();
+    } else { alert('❌ 권한이 없습니다.'); }
 }
+function goToDashboard() {
+    document.getElementById('sec-admin-menu').classList.add('hidden');
+    document.getElementById('sec-dashboard').classList.remove('hidden');
+    initAnalyzer(); 
+}
+// (나머지 showUserMgmt, renderList, addUser, delUser, backToAdmin 함수는 기존과 동일하게 유지)
 
-// --- 분석 엔진 ---
+// 4. 데이터 분석 엔진 (여기서부터가 핵심 수정본입니다!) [cite: 306-340]
 let shipDB = [], voyageDB = [], myChart;
 let v1Data = [], v2Data = [];
 
 async function initAnalyzer() {
     const minSel = document.getElementById('global_spd_min');
-    if (minSel.options.length > 0) return;
+    if (minSel.options.length > 0) return; // 중복 실행 방지
 
     initToolbar();
     initChart();
 
     try {
-        console.log("데이터 로딩 중...");
-        // [수정] Supabase에서 직접 데이터 가져오기
-        const { data: vslData } = await _supabase.from('VESSEL_DATA').select('*');
-        const { data: voyData } = await _supabase.from('VOY_DATA').select('*');
-        
-        shipDB = vslData || [];
-        voyageDB = voyData || [];
-        
-        console.log(`로딩 완료: 선박 ${shipDB.length}척, 운항기록 ${voyageDB.length}건`);
+        console.log("Supabase에서 데이터를 불러오는 중...");
+        const [shipsRes, voyageRes] = await Promise.all([
+    _supabase.from('VESSEL_DATA').select('*'),
+    _supabase.from('VOY_DATA').select('*').range(0, 60000) 
+]);
+
+        if (shipsRes.error) throw shipsRes.error;
+        if (voyageRes.error) throw voyageRes.error;
+
+        shipDB = shipsRes.data;
+        voyageDB = voyageRes.data;
+
+        console.log(`로딩 완료: 선박 ${shipDB.length}척, 기록 ${voyageDB.length}건`);
         refreshTables();
-    } catch (e) { console.error("로딩 실패:", e); }
-}
-
-function initToolbar() {
-    const minSel = document.getElementById('global_spd_min');
-    const maxSel = document.getElementById('global_spd_max');
-    for (let i = 5; i <= 25; i++) {
-        minSel.add(new Option(i, i)); maxSel.add(new Option(i, i));
+    } catch (e) {
+        console.error("데이터 로딩 실패:", e.message);
     }
-    minSel.value = 12; maxSel.value = 18;
 }
-
-function checkEnter(e, n) { if (e.key === 'Enter') runAnalysis(n); else handleSearch(n); }
 
 function handleSearch(num) {
     const code = document.getElementById(`vsl${num}_code`).value.trim().toUpperCase();
@@ -172,16 +630,20 @@ function runAnalysis(num) {
     const code = document.getElementById(`vsl${num}_code`).value.trim().toUpperCase();
     const rhMin = parseFloat(document.getElementById(`vsl${num}_rh_min`).value);
     const rhMax = parseFloat(document.getElementById(`vsl${num}_rh_max`).value);
+    const slipMin = parseFloat(document.getElementById(`vsl${num}_slip_min`).value);
+    const slipMax = parseFloat(document.getElementById(`vsl${num}_slip_max`).value);
     const minSpd = parseInt(document.getElementById('global_spd_min').value);
     const maxSpd = parseInt(document.getElementById('global_spd_max').value);
     
     const tableBody = document.getElementById(`vsl${num}_table`);
     tableBody.innerHTML = "";
 
-    // [수정] Supabase 컬럼명(대문자)에 맞춰 필터링
-    const filtered = voyageDB.filter(d => 
-        d.VSL_CODE === code && d.RUNNING_HOURS >= rhMin && d.RUNNING_HOURS <= rhMax
-    );
+    const filtered = voyageDB.filter(d => {
+        const dCode = (d.VSL_CODE || "").toString().toUpperCase();
+        const dRH = parseFloat(d.RUNNING_HOURS) || 0;
+        const dSlip = parseFloat(d.SLIP) || 0;
+        return dCode === code && dRH >= rhMin && dRH <= rhMax && dSlip >= slipMin && dSlip <= slipMax;
+    });
 
     let currentGraphData = [];
     for (let spd = maxSpd; spd >= minSpd; spd--) {
@@ -190,11 +652,11 @@ function runAnalysis(num) {
 
         if (group.length > 0) {
             const count = group.length;
-            res.rpm = (group.reduce((s, c) => s + (c.RPM || 0), 0) / count).toFixed(1);
+            res.rpm = (group.reduce((s, c) => s + (parseFloat(c.RPM) || 0), 0) / count).toFixed(1);
             
             const sumNorm = (key) => group.reduce((s, row) => {
-                const v = row[key] || 0;
-                const rh = row.RUNNING_HOURS || 0;
+                const v = parseFloat(row[key]) || 0;
+                const rh = parseFloat(row.RUNNING_HOURS) || 0;
                 return s + ((rh > 0) ? (v / rh) * 24 : 0);
             }, 0);
 
@@ -205,45 +667,126 @@ function runAnalysis(num) {
         } else {
             currentGraphData.push({x: spd, y: null});
         }
-        tableBody.innerHTML += `<tr><td>${spd}</td><td>${res.rpm}</td><td>${res.fo}</td><td>${res.mgo}</td><td class="total-cell">${res.total}</td></tr>`;
+        tableBody.innerHTML += `<tr><td style="font-weight:bold;">${spd}</td><td>${res.rpm}</td><td>${res.fo}</td><td>${res.mgo}</td><td class="total-cell">${res.total}</td></tr>`;
     }
+    
     if (num === 1) v1Data = currentGraphData.sort((a,b) => a.x - b.x);
     else v2Data = currentGraphData.sort((a,b) => a.x - b.x);
     updateChart();
 }
 
-function refreshTables() { [1, 2].forEach(n => drawEmptyTable(n)); }
-function drawEmptyTable(num) {
-    const minSpd = parseInt(document.getElementById('global_spd_min').value);
-    const maxSpd = parseInt(document.getElementById('global_spd_max').value);
-    const body = document.getElementById(`vsl${num}_table`);
-    body.innerHTML = "";
-    for (let spd = maxSpd; spd >= minSpd; spd--) body.innerHTML += `<tr><td>${spd}</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
+// 1. 툴바 초기화: 스피드 선택 드롭다운 생성 [cite: 312-315]
+        function initToolbar() {
+            const minSel = document.getElementById('global_spd_min');
+            const maxSel = document.getElementById('global_spd_max');
+            if (!minSel || !maxSel) return;
+            
+            for (let i = 5; i <= 25; i++) {
+                minSel.add(new Option(i, i));
+                maxSel.add(new Option(i, i));
+            }
+            minSel.value = 12;
+            maxSel.value = 18;
+        }
+
+// 엔터키를 눌렀을 때 분석을 실행하고, 평소에는 선박명을 검색하는 도우미 함수
+function checkEnter(event, num) { 
+    if (event.key === 'Enter') {
+        runAnalysis(num); 
+    } else {
+        handleSearch(num); 
+    }
 }
 
-function initChart() {
-    const ctx = document.getElementById('performanceChart').getContext('2d');
-    myChart = new Chart(ctx, {
-        type: 'line',
-        data: { labels: [], datasets: [
-            { label: 'Vessel 1 Cons.', borderColor: '#3498db', data: [], tension: 0.4 },
-            { label: 'Vessel 2 Cons.', borderColor: '#f39c12', data: [], tension: 0.4 }
-        ]},
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, ticks: { color: 'white' } }, x: { ticks: { color: 'white' } } }, plugins: { legend: { labels: { color: 'white' } } } }
-    });
-}
+        // 2. 테이블 새로고침: 빈 표를 그리고 차트를 업데이트 [cite: 315-316]
+        function refreshTables() { 
+            [1, 2].forEach(n => drawEmptyTable(n)); 
+            updateChart(); 
+        }
 
-function updateChart() {
-    if (!myChart) return;
-    const minSpd = parseInt(document.getElementById('global_spd_min').value);
-    const maxSpd = parseInt(document.getElementById('global_spd_max').value);
-    let labels = [];
-    for(let i = minSpd; i <= maxSpd; i++) labels.push(i);
-    myChart.data.labels = labels;
-    myChart.data.datasets[0].data = labels.map(s => { let f = v1Data.find(d => d.x === s); return f ? f.y : null; });
-    myChart.data.datasets[1].data = labels.map(s => { let f = v2Data.find(d => d.x === s); return f ? f.y : null; });
-    myChart.update();
-}
+        // 3. 빈 테이블 그리기: 데이터가 없을 때 기본 틀 출력 [cite: 340-343]
+        function drawEmptyTable(num) {
+            const minSpd = parseInt(document.getElementById('global_spd_min').value);
+            const maxSpd = parseInt(document.getElementById('global_spd_max').value);
+            const body = document.getElementById(`vsl${num}_table`);
+            if (!body) return;
+            
+            body.innerHTML = "";
+            for (let spd = maxSpd; spd >= minSpd; spd--) {
+                body.innerHTML += `<tr><td style="font-weight:bold;">${spd}</td><td>-</td><td>-</td><td>-</td><td>-</td></tr>`;
+            }
+        }
+
+        // 4. 차트 초기화: Chart.js 객체 생성 [cite: 343-355]
+        function initChart() {
+            const canvas = document.getElementById('performanceChart');
+            if (!canvas) return; 
+            const ctx = canvas.getContext('2d');
+
+            myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [
+                        { 
+                            label: 'Vessel 1 Total Cons.', 
+                            borderColor: '#3498db', 
+                            borderWidth: 3,
+                            data: [], 
+                            tension: 0.4,
+                            fill: false
+                        },
+                        { 
+                            label: 'Vessel 2 Total Cons.', 
+                            borderColor: '#f39c12', 
+                            borderWidth: 3,
+                            data: [], 
+                            tension: 0.4, 
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#ffffff' } } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.1)' }, ticks: { color: '#aaaaaa' } },
+                        x: { grid: { display: false }, ticks: { color: '#aaaaaa' } }
+                    }
+                }
+            });
+        }
+
+        // 5. 차트 업데이트: 계산된 데이터를 선으로 연결 [cite: 355-359]
+        function updateChart() {
+            if (!myChart) return;
+
+            const minSpd = parseInt(document.getElementById('global_spd_min').value);
+            const maxSpd = parseInt(document.getElementById('global_spd_max').value);
+            
+            let labels = [];
+            for(let i = minSpd; i <= maxSpd; i++) labels.push(i);
+            myChart.data.labels = labels;
+            
+            // Vessel 1 데이터 매핑
+            myChart.data.datasets[0].data = labels.map(spd => { 
+                let found = v1Data.find(d => d.x === spd); 
+                return found ? found.y : null; 
+            });
+
+            // Vessel 2 데이터 매핑
+            myChart.data.datasets[1].data = labels.map(spd => { 
+                let found = v2Data.find(d => d.x === spd); 
+                return found ? found.y : null; 
+            });
+            
+            myChart.update();
+        }
+// [이미지: 클라이언트-서버 데이터 흐름도]
 </script>
+
+
+
 </body>
 </html>
